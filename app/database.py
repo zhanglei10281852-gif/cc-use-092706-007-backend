@@ -311,6 +311,8 @@ PERMISSIONS = [
     ("announcements.write", "维护公告", "announcements", "write"),
     ("audit.read", "查看审计", "audit", "read"),
     ("jobs.run", "执行后台任务", "jobs", "run"),
+    ("birding.read", "查看观鸟活动", "birding", "read"),
+    ("birding.write", "管理观鸟活动", "birding", "write"),
 ]
 
 
