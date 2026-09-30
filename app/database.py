@@ -311,6 +311,9 @@ PERMISSIONS = [
     ("announcements.write", "维护公告", "announcements", "write"),
     ("audit.read", "查看审计", "audit", "read"),
     ("jobs.run", "执行后台任务", "jobs", "run"),
+    ("birding.event.write", "发布观鸟场次", "birding", "write"),
+    ("birding.event.admin", "管理观鸟场次", "birding", "admin"),
+    ("birding.signup", "观鸟活动报名", "birding", "signup"),
 ]
 
 
@@ -380,10 +383,30 @@ def init_db() -> None:
             "INSERT OR IGNORE INTO roles(code,name,description,is_system,created_at,updated_at) VALUES('auditor','审计查看员','只读查看业务与审计记录',1,?,?)",
             (now, now),
         )
+        connection.execute(
+            "INSERT OR IGNORE INTO roles(code,name,description,is_system,created_at,updated_at) VALUES('birding_organizer','观鸟组织方','发布与管理公益观鸟导赏场次',1,?,?)",
+            (now, now),
+        )
+        connection.execute(
+            "INSERT OR IGNORE INTO roles(code,name,description,is_system,created_at,updated_at) VALUES('birding_volunteer','观鸟志愿者','报名公益观鸟导赏活动',1,?,?)",
+            (now, now),
+        )
         administrator = connection.execute("SELECT id FROM roles WHERE code='administrator'").fetchone()[0]
         connection.execute(
             "INSERT OR IGNORE INTO role_permissions(role_id,permission_id,granted_at) SELECT ?,id,? FROM permissions",
             (administrator, now),
+        )
+        organizer = connection.execute("SELECT id FROM roles WHERE code='birding_organizer'").fetchone()[0]
+        volunteer = connection.execute("SELECT id FROM roles WHERE code='birding_volunteer'").fetchone()[0]
+        connection.execute(
+            "INSERT OR IGNORE INTO role_permissions(role_id,permission_id,granted_at) "
+            "SELECT ?,id,? FROM permissions WHERE code IN ('birding.event.write','birding.signup')",
+            (organizer, now),
+        )
+        connection.execute(
+            "INSERT OR IGNORE INTO role_permissions(role_id,permission_id,granted_at) "
+            "SELECT ?,id,? FROM permissions WHERE code='birding.signup'",
+            (volunteer, now),
         )
 
 
